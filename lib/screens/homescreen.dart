@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // class HomeScreen extends StatelessWidget {
 //   static const routeName = '/Home';
@@ -48,6 +49,24 @@ class MyHome extends StatefulWidget {
 
 class _MyHomeState extends State<MyHome> {
   static const routeName = '/Home';
+  var taskController;
+
+Future<void> saveData() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+}
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    taskController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    taskController.dispose();
+  }
   // var scaffoldkey = GlobalKey<ScaffoldState>();
 
   @override
@@ -69,7 +88,7 @@ class _MyHomeState extends State<MyHome> {
           showModalBottomSheet(
               context: context,
               builder: (BuildContext context) => Container(
-                    padding: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(10.0),
                     height: 250,
                     color: Colors.blue[200],
                     child: Column(
@@ -84,18 +103,19 @@ class _MyHomeState extends State<MyHome> {
                             ),
                             GestureDetector(
                               onTap: () => Navigator.of(context).pop(),
-                              child: Icon(Icons.close),
+                              child: const Icon(Icons.close),
                             )
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 1.2,
                           color: Colors.white,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20.0,
                         ),
                         TextField(
+                          controller: taskController,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(9.0)),
@@ -104,11 +124,11 @@ class _MyHomeState extends State<MyHome> {
                               filled: true,
                               hintStyle: GoogleFonts.montserrat()),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20.0,
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
                           width: MediaQuery.of(context).size.width,
                           child: Row(
                             children: [
@@ -116,7 +136,9 @@ class _MyHomeState extends State<MyHome> {
                                 width: (MediaQuery.of(context).size.width / 2) -
                                     20,
                                 child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      taskController.text = '';
+                                    },
                                     child: Text(
                                       'Reset',
                                       style: GoogleFonts.montserrat(
@@ -126,8 +148,11 @@ class _MyHomeState extends State<MyHome> {
                               SizedBox(
                                 width: (MediaQuery.of(context).size.width / 2) -
                                     20,
+                                    
                                 child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      saveData();
+                                    },
                                     child: Text(
                                       'Add',
                                       style: GoogleFonts.montserrat(),
@@ -140,7 +165,7 @@ class _MyHomeState extends State<MyHome> {
                     ),
                   ))
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
