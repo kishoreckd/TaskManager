@@ -1,45 +1,12 @@
 // ignore_for_file: avoid_print
+// import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// class HomeScreen extends StatelessWidget {
-//   static const routeName = '/Home';
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(
-//           'Task Manager',
-//           style: GoogleFonts.montserrat(),
-//         ),
-//       ),
-//       body: const Center(
-//         child: Text("No Task Addded yet"),
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         backgroundColor: Colors.blue,
-//         onPressed: () => showBottomSheet(
-//             context: context,
-//             builder: (BuildContext context) => Container(
-//                   color: Colors.blue,
-//                   child: Column(
-//                     children: [
-//                       Text(
-//                         'Add Task',
-//                         style: GoogleFonts.montserrat(
-//                             color: Colors.white, fontSize: 20.0),
-//                       )
-//                     ],
-//                   ),
-//                 )),
-//         child: Icon(Icons.add),
-//       ),
-//     );
-//   }
-// }
+import '../model/task.dart';
 
 class MyHome extends StatefulWidget {
   const MyHome({super.key});
@@ -49,23 +16,40 @@ class MyHome extends StatefulWidget {
 
 class _MyHomeState extends State<MyHome> {
   static const routeName = '/Home';
-  var taskController;
+  var _taskController = TextEditingController();
 
-Future<void> saveData() async {
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-}
+  // get json => null;
+
+  void saveData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Task t = Task.fromString(_taskController.text);
+    // print(t);
+    // prefs.remove('task');
+    var tasks = prefs.getString('task');
+    List list = (tasks == null) ? [] : json.decode(tasks);
+    print(list);
+    list.add(json.encode(t.getMap()));
+    prefs.setString('task', json.encode(list));
+    _taskController.text = '';
+    Navigator.of(context).pop();
+  }
+
+
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    taskController = TextEditingController();
+    _taskController = TextEditingController();
+
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
 
-    taskController.dispose();
+    _taskController.dispose();
   }
   // var scaffoldkey = GlobalKey<ScaffoldState>();
 
@@ -115,7 +99,7 @@ Future<void> saveData() async {
                           height: 20.0,
                         ),
                         TextField(
-                          controller: taskController,
+                          controller: _taskController,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(9.0)),
@@ -137,7 +121,7 @@ Future<void> saveData() async {
                                     20,
                                 child: ElevatedButton(
                                     onPressed: () {
-                                      taskController.text = '';
+                                      _taskController.text = '';
                                     },
                                     child: Text(
                                       'Reset',
@@ -148,7 +132,6 @@ Future<void> saveData() async {
                               SizedBox(
                                 width: (MediaQuery.of(context).size.width / 2) -
                                     20,
-                                    
                                 child: ElevatedButton(
                                     onPressed: () {
                                       saveData();
