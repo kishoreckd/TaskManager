@@ -18,6 +18,7 @@ class _MyHomeState extends State<MyHome> {
   static const routeName = '/Home';
   var _taskController = TextEditingController();
 
+  var _tasks;
   // get json => null;
 
   void saveData() async {
@@ -34,19 +35,30 @@ class _MyHomeState extends State<MyHome> {
     Navigator.of(context).pop();
   }
 
+  void _getTasks() async {
+    _tasks = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var tasks = prefs.getString('task');
+    List list = (tasks == null) ? [] : json.decode(tasks);
 
+    for (dynamic i in list) {
+      _tasks.add(Task.fromMap(json.decode(i)));
+    }
 
+    print(_tasks);
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _taskController = TextEditingController();
-
+    _getTasks();
   }
 
   @override
   void dispose() {
+    super.dispose();
     // TODO: implement dispose
 
     _taskController.dispose();
@@ -62,9 +74,22 @@ class _MyHomeState extends State<MyHome> {
           style: GoogleFonts.montserrat(),
         ),
       ),
-      body: const Center(
-        child: Text("No Task Addded yet"),
-      ),
+      body: (_tasks == null)
+          ? Center(
+              child: Text("No Task Addded yet"),
+            )
+          : Column(
+            
+              children: _tasks
+                  .map<Widget>((e) => Container(
+                        height: 70.0,
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        child: Text(e.task),
+                      ))
+                  .toList()),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
         onPressed: () => {
