@@ -18,18 +18,22 @@ class _MyHomeState extends State<MyHome> {
   static const routeName = '/Home';
   var _taskController = TextEditingController();
 
-  var _tasks;
+  List _tasks = [];
   // get json => null;
 
-  void saveData() async {
+  Future<void> saveData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Task t = Task.fromString(_taskController.text);
     // print(t);
     // prefs.remove('task');
     var tasks = prefs.getString('task');
     List list = (tasks == null) ? [] : json.decode(tasks);
+    print(list.runtimeType);
+    list.add((t.getMap()));
+    print(list.runtimeType);
+
     print(list);
-    list.add(json.encode(t.getMap()));
+
     prefs.setString('task', json.encode(list));
     _taskController.text = '';
     Navigator.of(context).pop();
@@ -40,12 +44,12 @@ class _MyHomeState extends State<MyHome> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var tasks = prefs.getString('task');
     List list = (tasks == null) ? [] : json.decode(tasks);
-
     for (dynamic i in list) {
+      // print(i.runtimeType);
+
       _tasks.add(Task.fromMap(json.decode(i)));
     }
-
-    print(_tasks);
+    setState(() {});
   }
 
   @override
@@ -53,6 +57,9 @@ class _MyHomeState extends State<MyHome> {
     // TODO: implement initState
     super.initState();
     _taskController = TextEditingController();
+    // Future(() async {
+    //   await saveData();
+    // });
     _getTasks();
   }
 
@@ -63,7 +70,6 @@ class _MyHomeState extends State<MyHome> {
 
     _taskController.dispose();
   }
-  // var scaffoldkey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -74,22 +80,23 @@ class _MyHomeState extends State<MyHome> {
           style: GoogleFonts.montserrat(),
         ),
       ),
-      body: (_tasks == null)
-          ? Center(
-              child: Text("No Task Addded yet"),
-            )
-          : Column(
-            
-              children: _tasks
-                  .map<Widget>((e) => Container(
-                        height: 70.0,
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0)),
-                        child: Text(e.task),
-                      ))
-                  .toList()),
+      body: Column(
+          children: _tasks
+              .map((e) => Container(
+                    height: 50.0,
+                    width: MediaQuery.of(context).size.width,
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 10.0),
+                    padding: EdgeInsets.only(left: 10.0),
+                    alignment: Alignment.centerLeft,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        border: Border.all(color: Colors.black, width: 0.5)),
+                    child: Text(
+                      e.task,
+                    ),
+                  ))
+              .toList()),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
         onPressed: () => {
