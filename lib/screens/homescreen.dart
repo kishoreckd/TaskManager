@@ -69,7 +69,7 @@ class _MyHomeState extends State<MyHome> {
 
     var pendingListEncoded = List.generate(
         pendingList.length, (i) => json.encode(pendingList[i].getMap()));
-
+    print(pendingListEncoded);
     prefs.setString('task', json.encode(pendingListEncoded));
 
     _getTasks();
