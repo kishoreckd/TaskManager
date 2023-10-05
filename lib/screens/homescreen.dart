@@ -41,6 +41,8 @@ class _MyHomeState extends State<MyHome> {
     prefs.setString('task', json.encode(list));
     _taskController.text = '';
     Navigator.of(context).pop();
+
+    _getTasks();
   }
 
   void _getTasks() async {
@@ -50,11 +52,27 @@ class _MyHomeState extends State<MyHome> {
     List list = (tasks == null) ? [] : json.decode(tasks);
     for (dynamic i in list) {
       // print(i.runtimeType);
-      _tasks.add(Task.fromMap(json.decode(i)));
+      _tasks.add(Task.fromMap(i as Map<String, dynamic>));
     }
 
     _tasksDone = List.generate(_tasks.length, (index) => false);
     setState(() {});
+  }
+
+  Future<void> updatePendingTasks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<Task> pendingList = [];
+
+    for (var i = 0; i < _tasks.length; i++) {
+      if (!_tasksDone![i]) pendingList.add(_tasks[i]);
+    }
+
+    var pendingListEncoded = List.generate(
+        pendingList.length, (i) => json.encode(pendingList[i].getMap()));
+
+    prefs.setString('task', json.encode(pendingListEncoded));
+
+    _getTasks();
   }
 
   @override
@@ -84,7 +102,23 @@ class _MyHomeState extends State<MyHome> {
           'Task Manager',
           style: GoogleFonts.montserrat(),
         ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.save))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                updatePendingTasks();
+              },
+              icon: Icon(Icons.save)),
+          IconButton(
+              onPressed: () async {
+                // print('pressed');
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('task', json.encode([]));
+                setState(() {
+                  _getTasks();
+                });
+              },
+              icon: Icon(Icons.delete))
+        ],
       ),
       body: Column(
           children: _tasks
