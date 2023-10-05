@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 // import 'dart:convert';
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,8 +19,11 @@ class _MyHomeState extends State<MyHome> {
   static const routeName = '/Home';
   var _taskController = TextEditingController();
 
+  ///It saves all thelist of tasks
   List _tasks = [];
-  // get json => null;
+
+  ///Task completed checking
+  List<bool>? _tasksDone;
 
   Future<void> saveData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -46,9 +50,10 @@ class _MyHomeState extends State<MyHome> {
     List list = (tasks == null) ? [] : json.decode(tasks);
     for (dynamic i in list) {
       // print(i.runtimeType);
-
       _tasks.add(Task.fromMap(json.decode(i)));
     }
+
+    _tasksDone = List.generate(_tasks.length, (index) => false);
     setState(() {});
   }
 
@@ -79,6 +84,7 @@ class _MyHomeState extends State<MyHome> {
           'Task Manager',
           style: GoogleFonts.montserrat(),
         ),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.save))],
       ),
       body: Column(
           children: _tasks
@@ -100,9 +106,13 @@ class _MyHomeState extends State<MyHome> {
                           style: GoogleFonts.montserrat(),
                         ),
                         Checkbox(
-                          value: false,
+                          value: _tasksDone?[_tasks.indexOf(e)],
                           key: GlobalKey(),
-                          onChanged: (bool? value) {},
+                          onChanged: (val) {
+                            setState(() {
+                              _tasksDone![_tasks.indexOf(e)] = val!;
+                            });
+                          },
                         )
                       ],
                     ),
