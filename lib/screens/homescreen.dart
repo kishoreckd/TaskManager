@@ -92,8 +92,19 @@ class _MyHomeState extends State<MyHome> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5.0),
                         border: Border.all(color: Colors.black, width: 0.5)),
-                    child: Text(
-                      e.task,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          e.task,
+                          style: GoogleFonts.montserrat(),
+                        ),
+                        Checkbox(
+                          value: false,
+                          key: GlobalKey(),
+                          onChanged: (bool? value) {},
+                        )
+                      ],
                     ),
                   ))
               .toList()),
